@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Тренажёр: Первая мировая война</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f0e8;
+            color: #2c2416;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 850px;
+            background: #fffcf2;
+            border-radius: 24px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+            overflow: hidden;
+            padding: 25px 30px 30px;
+            border: 1px solid #d6c29d;
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 2.1em;
+            color: #3e4a2b;
+            margin-bottom: 15px;
+            letter-spacing: 1px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .tabs {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+        }
+
+        .tab-btn {
+            background: #d9cdb0;
+            border: none;
+            padding: 12px 24px;
+            font-size: 1.05em;
+            font-weight: 600;
+            color: #3e3a2e;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: 0.2s;
+            letter-spacing: 0.5px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+        }
+
+        .tab-btn.active {
+            background: #7b8c4b;
+            color: white;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        }
+
+        .panel {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .panel.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Теория аккордеон */
+        .accordion-item {
+            margin-bottom: 9px;
+            border: 1px solid #cbbf9c;
+            border-radius: 12px;
+            overflow: hidden;
+            background: #fefbec;
+            transition: 0.2s;
+        }
+
+        .accordion-header {
+            background: #e7ddc5;
+            padding: 14px 18px;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 1.05em;
+            color: #3e452a;
+        }
+
+        .accordion-header:hover {
+            background: #dbceab;
+        }
+
+        .accordion-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.35s ease;
+            padding: 0 18px;
+            background: #fffef5;
+            font-size: 0.96em;
+            line-height: 1.6;
+            color: #3c3627;
+        }
+
+        .accordion-content.open {
+            max-height: 500px;
+            padding: 16px 18px;
+        }
+
+        .theory-text {
+            white-space: pre-line;
+        }
+
+        /* Вопросы */
+        .question-box {
+            background: #f3ecd9;
+            border-radius: 20px;
+            padding: 22px;
+            margin-bottom: 22px;
+            border: 1px solid #c7b27e;
+        }
+
+        .question-text {
+            font-weight: 700;
+            font-size: 1.2em;
+            margin-bottom: 15px;
+            color: #3d4026;
+        }
+
+        .source-selector {
+            margin-bottom: 18px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .source-selector label {
+            font-weight: 600;
+            color: #4a4a3a;
+        }
+
+        .source-selector select {
+            padding: 10px 15px;
+            border-radius: 25px;
+            border: 2px solid #b7a77b;
+            background: #fffef9;
+            font-size: 0.95em;
+            font-weight: 500;
+            cursor: pointer;
+        }
+
+        .answer-input {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .answer-input input {
+            flex: 2;
+            min-width: 200px;
+            padding: 12px 16px;
+            border: 2px solid #b7a77b;
+            border-radius: 30px;
+            font-size: 1em;
+            background: #fffef9;
+        }
+
+        .btn {
+            background: #7b8c4b;
+            color: white;
+            border: none;
+            padding: 12px 22px;
+            border-radius: 30px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+            font-size: 0.95em;
+            letter-spacing: 0.3px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .btn:hover {
+            background: #5f6e37;
+        }
+
+        .btn-random {
+            background: #b48b4b;
+        }
+
+        .btn-random:hover {
+            background: #9b7337;
+        }
+
+        .btn-show-answer {
+            background: #b48b4b;
+            margin-left: 5px;
+        }
+
+        .result-message {
+            margin-top: 15px;
+            font-style: italic;
+            font-weight: 500;
+        }
+
+        .correct {
+            color: #2b662b;
+        }
+
+        .incorrect {
+            color: #b43b3b;
+        }
+
+        /* Карточки */
+        .card-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 22px;
+        }
+
+        .flashcard {
+            width: 280px;
+            height: 180px;
+            perspective: 800px;
+            cursor: pointer;
+        }
+
+        .flashcard-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            text-align: center;
+            transition: transform 0.5s;
+            transform-style: preserve-3d;
+        }
+
+        .flashcard.flipped .flashcard-inner {
+            transform: rotateY(180deg);
+        }
+
+        .front, .back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            border-radius: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 18px;
+            font-weight: 600;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+            border: 1px solid #c7b27e;
+        }
+
+        .front {
+            background: #e6d7b4;
+            color: #3a3620;
+            font-size: 1.25em;
+        }
+
+        .back {
+            background: #c7d6a3;
+            color: #283016;
+            transform: rotateY(180deg);
+            font-size: 0.95em;
+            line-height: 1.4;
+        }
+
+        .card-controls {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        hr {
+            border: 0;
+            height: 1px;
+            background: #d6c29d;
+            margin: 15px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>⚔️ Первая мировая война</h1>
+
+        <!-- Вкладки -->
+        <div class="tabs">
+            <button class="tab-btn active" data-tab="theory">📘 Теория</button>
+            <button class="tab-btn" data-tab="questions">❓ Вопросы</button>
+            <button class="tab-btn" data-tab="cards">🃏 Карточки</button>
+        </div>
+
+        <!-- Панель Теории -->
+        <div id="theory" class="panel active">
+            <div class="accordion-item">
+                <div class="accordion-header">1. Причины и начало войны (1914) <span>▼</span></div>
+                <div class="accordion-content"><div class="theory-text">
+                    <strong>Тройственный союз:</strong> Германия, Австро-Венгрия, Италия (до 1915).<br>
+                    <strong>Антанта:</strong> Великобритания, Франция, Россия.<br>
+                    <strong>Повод:</strong> убийство эрцгерцога Франца Фердинанда в Сараево 28 июня 1914 г.<br>
+                    Германия стремилась к быстрой войне на западе (блицкриг), чтобы избежать войны на два фронта. План провалился в битве на Марне (сентябрь 1914), и война стала позиционной.
+                </div></div>
+            </div>
+            <div class="accordion-item">
+                <div class="accordion-header">2. Ход военных действий (1914–1916) <span>▼</span></div>
+                <div class="accordion-content"><div class="theory-text">
+                    <strong>1914:</strong> Битва на Марне, переход к позиционной войне.<br>
+                    <strong>1915:</strong> Основные тяготы на Восточном фронте, первое применение отравляющих газов (Ипр).<br>
+                    <strong>1916:</strong> «Верденская мясорубка» (февраль–декабрь), битва на Сомме (первое применение танков).<br>
+                    <strong>Брусиловский прорыв</strong> (июнь–июль 1916) – успешное наступление русской армии, коренной перелом в пользу Антанты.
+                </div></div>
+            </div>
+            <div class="accordion-item">
+                <div class="accordion-header">3. Политические события и ход войны (1917–1918) <span>▼</span></div>
+                <div class="accordion-content"><div class="theory-text">
+                    <strong>1917:</strong> Февральская и Октябрьская революции в России, падение боеспособности армии. Вступление США в войну (апрель 1917).<br>
+                    <strong>«Мясорубка Нивеля»</strong>, битва при Камбре (массированная танковая атака).<br>
+                    <strong>1918:</strong> Брестский мир (3 марта) – выход России из войны. Весеннее наступление Германии, вторая битва на Марне. Создание единого командования Антанты (маршал Фош).<br>
+                    <strong>Компьенское перемирие</strong> 11 ноября 1918 г. – капитуляция Германии.
+                </div></div>
+            </div>
+            <div class="accordion-item">
+                <div class="accordion-header">4. Итоги и последствия <span>▼</span></div>
+                <div class="accordion-content"><div class="theory-text">
+                    <strong>Людские потери:</strong> около 10 млн погибших, 55 млн раненых.<br>
+                    <strong>Распад империй:</strong> Российская, Германская, Австро-Венгерская, Османская.<br>
+                    <strong>Новые государства:</strong> Чехословакия, Югославия, Польша, Финляндия, страны Балтии и др.<br>
+                    Европейская гегемония ослабла; на мировую арену вышли США и СССР.
+                </div></div>
+            </div>
+        </div>
+
+        <!-- Панель вопросов -->
+        <div id="questions" class="panel">
+            <div class="source-selector">
+                <label for="questionSource">📚 Источник вопросов:</label>
+                <select id="questionSource">
+                    <option value="general">Основные вопросы</option>
+                    <option value="flashcards">Карточки (термины и персоналии)</option>
+                    <option value="dates">📅 Даты (события по году)</option>
+                </select>
+            </div>
+            <div class="question-box">
+                <div class="question-text" id="questionDisplay">Нажмите "Случайный вопрос"</div>
+                <div class="answer-input">
+                    <input type="text" id="answerInput" placeholder="Введите ваш ответ...">
+                    <button class="btn" id="checkBtn">Проверить</button>
+                    <button class="btn btn-show-answer" id="showAnswerBtn">👁 Показать ответ</button>
+                </div>
+                <div class="result-message" id="resultMsg"></div>
+            </div>
+            <button class="btn btn-random" id="randomQuestionBtn">🎲 Случайный вопрос</button>
+        </div>
+
+        <!-- Панель карточек -->
+        <div id="cards" class="panel">
+            <div class="card-container">
+                <div class="flashcard" id="flashcard">
+                    <div class="flashcard-inner">
+                        <div class="front" id="frontText">?</div>
+                        <div class="back" id="backText">?</div>
+                    </div>
+                </div>
+                <div class="card-controls">
+                    <button class="btn btn-random" id="randomCardBtn">🎲 Случайная карточка</button>
+                </div>
+                <small style="color: #6b5d3e;">Нажмите на карточку, чтобы перевернуть</small>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        (function() {
+            // ---------- Данные ----------
+            const accordionHeaders = document.querySelectorAll('.accordion-header');
+
+            // Основные вопросы
+            const questionsGeneral = [
+                { q: "Какая страна первой объявила войну в 1914 г.?", a: "Австро-Венгрия (Сербии)" },
+                { q: "Какое событие послужило поводом к началу Первой мировой войны?", a: "Убийство эрцгерцога Франца Фердинанда в Сараево" },
+                { q: "В каком году и где впервые были применены отравляющие газы?", a: "1915, у города Ипр (хлор)" },
+                { q: "Как назывался план быстрого разгрома Франции Германией?", a: "Блицкриг (молниеносная война)" },
+                { q: "Какое сражение 1916 года получило название 'Верденская мясорубка'?", a: "Битва под Верденом (февраль-декабрь 1916)" },
+                { q: "Кто командовал успешным наступлением русской армии летом 1916 г.?", a: "Генерал А.А. Брусилов" },
+                { q: "Когда США вступили в Первую мировую войну на стороне Антанты?", a: "Апрель 1917 г." },
+                { q: "Что такое 'сепаратный мир'?", a: "Мирный договор, заключённый одним из участников коалиции без союзников" },
+                { q: "Какой мирный договор подписала Советская Россия с Германией в 1918 г.?", a: "Брестский мир (3 марта 1918)" },
+                { q: "Как звали маршала Франции, ставшего главнокомандующим союзными войсками в 1918 г.?", a: "Фердинанд Фош" },
+                { q: "Где и когда было подписано перемирие, завершившее Первую мировую войну?", a: "11 ноября 1918 г. в Компьенском лесу" }
+            ];
+
+            // Карточки (термины + персоналии)
+            const flashcards = [
+                { term: "Тройственный союз", definition: "Военный блок Германии, Австро-Венгрии и Италии (до 1915 г.)" },
+                { term: "Антанта", definition: "Союз Великобритании, Франции и России; в ходе войны к ней присоединились многие страны (всего ~25)" },
+                { term: "Блицкриг", definition: "План молниеносной войны Германии; провалился в битве на Марне (1914)" },
+                { term: "Позиционная война", definition: "Тип боевых действий на стабильных сплошных фронтах с глубокой обороной" },
+                { term: "«Верденская мясорубка»", definition: "Кровопролитное сражение 1916 г. под Верденом, символ войны на истощение" },
+                { term: "Брусиловский прорыв", definition: "Наступление русской армии (лето 1916), крупное поражение австро-германских сил" },
+                { term: "Сепаратный мир", definition: "Мир, заключённый отдельно от союзников; пример — Брестский мир 1918" },
+                { term: "Компьенское перемирие", definition: "Соглашение 11 ноября 1918 г., окончившее Первую мировую войну" },
+                { term: "Гаврило Принцип", definition: "Сербский националист, убивший эрцгерцога Франца Фердинанда (повод к войне)" },
+                { term: "А.А. Брусилов", definition: "Российский генерал, руководитель успешного наступления 1916 г." },
+                { term: "Жорж Клемансо", definition: "Премьер-министр Франции с 1917 г., 'Тигр', сторонник войны до победного конца" },
+                { term: "Фердинанд Фош", definition: "Маршал Франции, главнокомандующий союзными войсками в 1918 г." },
+                { term: "Р.Ж. Нивель", definition: "Французский генерал, автор провального наступления 1917 г. ('мясорубка Нивеля')" },
+                { term: "Н.Д. Зелинский", definition: "Русский химик, изобрёл угольный противогаз в 1915 г." },
+                { term: "Тотальная война", definition: "Война, в которой задействованы все ресурсы государства и стирается грань между фронтом и тылом" }
+            ];
+
+            // Даты (события по году) – новая группа
+            const questionsDates = [
+                { q: "28 июня 1914 г.", a: "Убийство эрцгерцога Франца Фердинанда в Сараево (повод к войне)" },
+                { q: "1 августа 1914 г.", a: "Германия объявила войну России" },
+                { q: "1915 г.", a: "Первое применение отравляющих газов (хлор) у города Ипр" },
+                { q: "Февраль – декабрь 1916 г.", a: "«Верденская мясорубка» – кровопролитное сражение на Западном фронте" },
+                { q: "Май – июль 1916 г.", a: "Брусиловский прорыв – успешное наступление русской армии" },
+                { q: "Апрель 1917 г.", a: "Вступление США в Первую мировую войну на стороне Антанты" },
+                { q: "3 марта 1918 г.", a: "Брестский мир – выход Советской России из войны" },
+                { q: "11 ноября 1918 г.", a: "Компьенское перемирие, завершившее Первую мировую войну" }
+            ];
+
+            // ---------- Вкладки ----------
+            const tabBtns = document.querySelectorAll('.tab-btn');
+            const panels = {
+                theory: document.getElementById('theory'),
+                questions: document.getElementById('questions'),
+                cards: document.getElementById('cards')
+            };
+
+            tabBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const tabId = btn.getAttribute('data-tab');
+                    tabBtns.forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    Object.values(panels).forEach(p => p.classList.remove('active'));
+                    panels[tabId].classList.add('active');
+                });
+            });
+
+            // ---------- Аккордеон (теория) ----------
+            accordionHeaders.forEach(header => {
+                header.addEventListener('click', () => {
+                    const content = header.nextElementSibling;
+                    document.querySelectorAll('.accordion-content').forEach(c => {
+                        if (c !== content) c.classList.remove('open');
+                    });
+                    content.classList.toggle('open');
+                });
+            });
+            document.querySelector('.accordion-content').classList.add('open');
+
+            // ---------- Тренажёр вопросов ----------
+            const questionDisplay = document.getElementById('questionDisplay');
+            const answerInput = document.getElementById('answerInput');
+            const checkBtn = document.getElementById('checkBtn');
+            const showAnswerBtn = document.getElementById('showAnswerBtn');
+            const randomQuestionBtn = document.getElementById('randomQuestionBtn');
+            const resultMsg = document.getElementById('resultMsg');
+            const questionSourceSelect = document.getElementById('questionSource');
+
+            let currentQuestion = null;
+
+            function getRandomItem(array) {
+                return array[Math.floor(Math.random() * array.length)];
+            }
+
+            function loadRandomQuestion() {
+                const source = questionSourceSelect.value;
+                let item;
+                if (source === 'general') {
+                    item = getRandomItem(questionsGeneral);
+                    currentQuestion = { q: item.q, a: item.a };
+                } else if (source === 'flashcards') {
+                    const card = getRandomItem(flashcards);
+                    currentQuestion = { q: card.term, a: card.definition };
+                } else if (source === 'dates') {
+                    item = getRandomItem(questionsDates);
+                    currentQuestion = { q: item.q, a: item.a };
+                }
+                questionDisplay.textContent = currentQuestion.q;
+                answerInput.value = '';
+                resultMsg.textContent = '';
+                resultMsg.className = 'result-message';
+            }
+
+            function checkAnswer() {
+                if (!currentQuestion) {
+                    resultMsg.textContent = 'Сначала выберите вопрос!';
+                    resultMsg.className = 'result-message incorrect';
+                    return;
+                }
+                const userAnswer = answerInput.value.trim();
+                const correctAnswer = currentQuestion.a.trim();
+                const normalizedUser = userAnswer.toLowerCase().replace(/\s+/g, ' ');
+                const normalizedCorrect = correctAnswer.toLowerCase().replace(/\s+/g, ' ');
+                if (normalizedUser === normalizedCorrect || (normalizedUser.includes(normalizedCorrect) && normalizedUser.length > 3)) {
+                    resultMsg.textContent = '✅ Верно!';
+                    resultMsg.className = 'result-message correct';
+                } else {
+                    resultMsg.innerHTML = `❌ Неверно. Правильный ответ: <strong>${correctAnswer}</strong>`;
+                    resultMsg.className = 'result-message incorrect';
+                }
+            }
+
+            function showCorrectAnswer() {
+                if (!currentQuestion) {
+                    resultMsg.textContent = 'Сначала выберите вопрос!';
+                    resultMsg.className = 'result-message incorrect';
+                    return;
+                }
+                resultMsg.innerHTML = `📖 Правильный ответ: <strong>${currentQuestion.a}</strong>`;
+                resultMsg.className = 'result-message';
+            }
+
+            randomQuestionBtn.addEventListener('click', loadRandomQuestion);
+            checkBtn.addEventListener('click', checkAnswer);
+            showAnswerBtn.addEventListener('click', showCorrectAnswer);
+
+            questionSourceSelect.addEventListener('change', () => {
+                loadRandomQuestion();
+            });
+
+            if (panels.questions.classList.contains('active')) {
+                loadRandomQuestion();
+            }
+            document.querySelector('[data-tab="questions"]').addEventListener('click', () => {
+                if (!currentQuestion) {
+                    loadRandomQuestion();
+                }
+            });
+
+            // ---------- Тренажёр карточек ----------
+            const flashcardDiv = document.getElementById('flashcard');
+            const frontText = document.getElementById('frontText');
+            const backText = document.getElementById('backText');
+            const randomCardBtn = document.getElementById('randomCardBtn');
+            let currentCard = null;
+
+            function loadRandomCard() {
+                const card = getRandomItem(flashcards);
+                currentCard = card;
+                frontText.textContent = card.term;
+                backText.textContent = card.definition;
+                flashcardDiv.classList.remove('flipped');
+            }
+
+            flashcardDiv.addEventListener('click', () => {
+                flashcardDiv.classList.toggle('flipped');
+            });
+
+            randomCardBtn.addEventListener('click', loadRandomCard);
+
+            if (panels.cards.classList.contains('active')) {
+                loadRandomCard();
+            }
+            document.querySelector('[data-tab="cards"]').addEventListener('click', () => {
+                if (!currentCard) {
+                    loadRandomCard();
+                }
+            });
+
+            // Первоначальная загрузка (на случай, если панели показаны)
+            loadRandomQuestion();
+            loadRandomCard();
+        })();
+    </script>
+</body>
+</html>
